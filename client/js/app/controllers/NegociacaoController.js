@@ -28,6 +28,8 @@ class NegociacaoController {
     this._limpaFormulario();
 
     this._mensagem.texto = "Negociação adicionada com sucesso";
+    this._mensagemView.update(this._mensagem);
+
     this._negociacoesView.update( this._listaNegociacoes );
   }
 
@@ -37,6 +39,14 @@ class NegociacaoController {
 
     this._inputQuantidade.value = 1;
     this._inputValor.value = 0.0;
+  }
+
+  apaga() {
+    this._listaNegociacoes.esvazia();
+    this._negociacoesView.update(this._listaNegociacoes);
+
+    this._mensagem.texto = 'Negociações apagadas com sucesso';
+    this._mensagemView.update(this._mensagem);
   }
 
   _criaNegociacao() {
