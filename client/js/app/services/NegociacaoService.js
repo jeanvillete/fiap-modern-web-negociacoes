@@ -1,8 +1,9 @@
 class NegociacaoService {
-  obterNegociacoesDaSemana(cb) {
+
+  _obterNegociacoes(url, cb) {
     let xhr = new XMLHttpRequest();
 
-    xhr.open('GET', 'http://localhost:3000/negociacoes/semana');
+    xhr.open('GET', url);
 
     // 0: requisição ainda não iniciada
     // 1: conexão com o servidor estabelecida
@@ -36,5 +37,17 @@ class NegociacaoService {
     }
 
     xhr.send();
+  }
+
+  obterNegociacoesDaSemana(cb) {
+    this._obterNegociacoes('http://localhost:3000/negociacoes/semana', cb);
+  }
+
+  obterNegociacoesDaSemanaAnterior(cb) {
+    this._obterNegociacoes('http://localhost:3000/negociacoes/anterior', cb);
+  }
+
+  obterNegociacoesDaSemanaRetrasada(cb) {
+    this._obterNegociacoes('http://localhost:3000/negociacoes/retrasada', cb);
   }
 }

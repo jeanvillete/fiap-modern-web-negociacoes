@@ -51,6 +51,9 @@ class NegociacaoController {
 
   importaNegociacoes() {
     let service = new NegociacaoService();
+
+    // service.obterNegociacoesDaSemanaAnterior( (erro, negociacoes) => {
+    // service.obterNegociacoesDaSemanaRetrasada( (erro, negociacoes) => {
     service.obterNegociacoesDaSemana( (erro, negociacoes) => {
       if (erro) {
         this._mensagem.texto = erro;
