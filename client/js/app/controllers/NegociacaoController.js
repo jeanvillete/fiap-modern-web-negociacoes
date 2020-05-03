@@ -50,47 +50,24 @@ class NegociacaoController {
   }
 
   importaNegociacoes() {
-    let xhr = new XMLHttpRequest();
+    let service = new NegociacaoService();
+    service.obterNegociacoesDaSemana( (erro, negociacoes) => {
+      if (erro) {
+        this._mensagem.texto = erro;
+        this._mensagemView.update(this._mensagem);
 
-    xhr.open('GET', 'http://localhost:3000/negociacoes/semana');
-
-    // 0: requisição ainda não iniciada
-    // 1: conexão com o servidor estabelecida
-    // 2: requisição recebida no servidor
-    // 3: processando requisição no servidor
-    // 4: resposta do processamento devolvida para o cliente
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState == 4) {
-        if (xhr.status == 200) {
-          console.log("Obtendo as negociações do servidor");
-          console.log(xhr.responseText);
-
-          JSON.parse(xhr.responseText)
-            .map(objeto =>
-              new Negociacao(
-                new Date(objeto.data),
-                objeto.quantidade,
-                objeto.valor
-              )
-            )
-            .forEach(negociacao => 
-              this._listaNegociacoes.adiciona(negociacao)
-            );
-            this._negociacoesView.update(this._listaNegociacoes);
-
-            this._mensagem.texto = 'Negociações importadas com sucesso';
-            this._mensagemView.update(this._mensagem);
-        } else {
-          this._mensagem.texto = 'Não foi possível importar as negociações';
-          this._mensagemView.update(this._mensagem);
-
-          console.log("Não foi possível obter as negociações do servido");
-          console.log(xhr.responseText);
-        }
+        return;
       }
-    }
+      
+      
+      negociacoes.forEach(negociacao => 
+        this._listaNegociacoes.adiciona(negociacao)
+      );
+      this._negociacoesView.update(this._listaNegociacoes);
 
-    xhr.send();
+      this._mensagem.texto = 'Negociações importadas com sucesso';
+      this._mensagemView.update(this._mensagem);
+    });
   }
 
   _criaNegociacao() {
