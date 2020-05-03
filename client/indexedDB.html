@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"/>
+    <title>IndexedDB</title>
+  </head>
+  <body>
+    <script src="js/app/services/IndexedDBService.js"></script>
+
+    <script src="js/app/models/Negociacao.js"></script>
+    <script>
+      const objectStoreName = "negociacoes";
+
+      const indexedDBService = new IndexedDBService([
+        {
+          objectStoreName: objectStoreName, 
+          keyGenerator: IndexedDBService.DEFAULT_KEY_GENERATOR()
+        }
+      ]);
+
+      function adiciona(data = new Date(), quantidade = 1, valor = 200) {
+        indexedDBService
+          .overObjectStore(objectStoreName)
+          .accessMode({read : true, write : true})
+          .doInsert(
+              new Negociacao(
+                data,
+                quantidade,
+                valor
+              )
+          )
+          .then(negociacaoChave => {
+            console.log("Negociação inserida com sucesso, e a chave de identificação resultante é; ", negociacaoChave);
+          })
+          .catch(erro => {
+            console.error("Erro an tentar inserir negociação; ", erro);
+          });
+      }
+
+      function listaTodos() {
+        indexedDBService
+          .overObjectStore(objectStoreName)
+          .accessMode({read : true})
+          .retrieveAll()
+          .then(elementosIndexedDB => {
+            const negociacoes = elementosIndexedDB.map(elementoIndexedDB =>
+              new Negociacao(
+                elementoIndexedDB._data,
+                elementoIndexedDB._quantidade,
+                elementoIndexedDB._valor,
+              )
+            );
+            console.log("Negociações atualmente armazenadas; ", negociacoes)
+          })
+          .catch(erro => {
+            console.error("Erro ao tentar recuperar lista de negociações; ", erro)
+          });
+      }
+    </script>
+  </body>
+</html>
