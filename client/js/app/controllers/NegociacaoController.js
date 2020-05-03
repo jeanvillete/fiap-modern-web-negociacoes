@@ -54,23 +54,35 @@ class NegociacaoController {
 
     // service.obterNegociacoesDaSemanaAnterior( (erro, negociacoes) => {
     // service.obterNegociacoesDaSemanaRetrasada( (erro, negociacoes) => {
-    service.obterNegociacoesDaSemana( (erro, negociacoes) => {
-      if (erro) {
-        this._mensagem.texto = erro;
+    // service.obterNegociacoesDaSemana( (erro, negociacoes) => {
+
+    const negociacoesCarregadasComSucesso = (mensagem) =>
+      (negociacoes) => {
+        negociacoes.forEach(negociacao => 
+          this._listaNegociacoes.adiciona(negociacao)
+        );
+        this._negociacoesView.update(this._listaNegociacoes);
+
+        this._mensagem.texto = mensagem;
         this._mensagemView.update(this._mensagem);
-
-        return;
       }
-      
-      
-      negociacoes.forEach(negociacao => 
-        this._listaNegociacoes.adiciona(negociacao)
-      );
-      this._negociacoesView.update(this._listaNegociacoes);
 
-      this._mensagem.texto = 'Negociações importadas com sucesso';
+    const tratamentoFalhaAoCarregarNegociacoes = (erro) => {
+      this._mensagem.texto = erro;
       this._mensagemView.update(this._mensagem);
-    });
+    }
+
+    service.obterNegociacoesDaSemana()
+      .then(negociacoesCarregadasComSucesso('Negociações da semana corrente importadas com sucesso'))
+      .catch(tratamentoFalhaAoCarregarNegociacoes);
+
+    service.obterNegociacoesDaSemanaAnterior()
+      .then(negociacoesCarregadasComSucesso('Negociações da semana anterior importadas com sucesso'))
+      .catch(tratamentoFalhaAoCarregarNegociacoes);
+
+    service.obterNegociacoesDaSemanaRetrasada()
+      .then(negociacoesCarregadasComSucesso('Negociações da semana retrasada importadas com sucesso'))
+      .catch(tratamentoFalhaAoCarregarNegociacoes);
   }
 
   _criaNegociacao() {

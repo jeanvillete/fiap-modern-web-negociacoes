@@ -1,53 +1,55 @@
 class NegociacaoService {
 
-  _obterNegociacoes(url, cb) {
-    let xhr = new XMLHttpRequest();
+  _obterNegociacoes(url, mensagemErro) {
+    return new Promise( (resolve, reject) => {
+      let xhr = new XMLHttpRequest();
 
-    xhr.open('GET', url);
+      xhr.open('GET', url);
 
-    // 0: requisição ainda não iniciada
-    // 1: conexão com o servidor estabelecida
-    // 2: requisição recebida no servidor
-    // 3: processando requisição no servidor
-    // 4: resposta do processamento devolvida para o cliente
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState == 4) {
-        console.log(xhr.responseText);
+      // 0: requisição ainda não iniciada
+      // 1: conexão com o servidor estabelecida
+      // 2: requisição recebida no servidor
+      // 3: processando requisição no servidor
+      // 4: resposta do processamento devolvida para o cliente
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState == 4) {
+          console.log(xhr.responseText);
 
-        if (xhr.status == 200) {
-          console.log("Resposta de sucesso, obtendo as negociações do servidor");
+          if (xhr.status == 200) {
+            console.log("Resposta de sucesso, obtendo as negociações do servidor");
 
-          cb(
-            null,
-            JSON.parse(xhr.responseText)
-              .map(objeto =>
-                new Negociacao(
-                  new Date(objeto.data),
-                  objeto.quantidade,
-                  objeto.valor
+            resolve(
+              JSON.parse(xhr.responseText)
+                .map(objeto =>
+                  new Negociacao(
+                    new Date(objeto.data),
+                    objeto.quantidade,
+                    objeto.valor
+                  )
                 )
-              )
-          );
-        } else {
-          console.log("Não foi possível obter as negociações do servido");
+            );
+          } else {
+            console.log("Não foi possível obter as negociações através da url;", url);
 
-          cb('Não foi possível importar as negociações', null);
+            reject(mensagemErro);
+          }
         }
       }
-    }
 
-    xhr.send();
+      xhr.send();
+    });
+
   }
 
-  obterNegociacoesDaSemana(cb) {
-    this._obterNegociacoes('http://localhost:3000/negociacoes/semana', cb);
+  obterNegociacoesDaSemana() {
+    return this._obterNegociacoes('http://localhost:3000/negociacoes/semana', 'Não foi possível importar as negociações da semana corrente');
   }
 
-  obterNegociacoesDaSemanaAnterior(cb) {
-    this._obterNegociacoes('http://localhost:3000/negociacoes/anterior', cb);
+  obterNegociacoesDaSemanaAnterior() {
+    return this._obterNegociacoes('http://localhost:3000/negociacoes/anterior', 'Não foi possível importar as negociações da semana anterior');
   }
 
-  obterNegociacoesDaSemanaRetrasada(cb) {
-    this._obterNegociacoes('http://localhost:3000/negociacoes/retrasada', cb);
+  obterNegociacoesDaSemanaRetrasada() {
+    return this._obterNegociacoes('http://localhost:3000/negociacoes/retrasada', 'Não foi possível importar as negociações da semana retrasada');
   }
 }
