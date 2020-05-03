@@ -52,37 +52,28 @@ class NegociacaoController {
   importaNegociacoes() {
     let service = new NegociacaoService();
 
-    // service.obterNegociacoesDaSemanaAnterior( (erro, negociacoes) => {
-    // service.obterNegociacoesDaSemanaRetrasada( (erro, negociacoes) => {
-    // service.obterNegociacoesDaSemana( (erro, negociacoes) => {
-
-    const negociacoesCarregadasComSucesso = (mensagem) =>
-      (negociacoes) => {
-        negociacoes.forEach(negociacao => 
+    Promise.all([
+      service.obterNegociacoesDaSemana(),
+      service.obterNegociacoesDaSemanaAnterior(),
+      service.obterNegociacoesDaSemanaRetrasada()
+    ])
+    .then(negociacoes => {
+      negociacoes.reduce(
+        (arrayAchatado, array) => arrayAchatado.concat(array),
+        []
+      )
+        .forEach(negociacao => 
           this._listaNegociacoes.adiciona(negociacao)
         );
-        this._negociacoesView.update(this._listaNegociacoes);
+      this._negociacoesView.update(this._listaNegociacoes);
 
-        this._mensagem.texto = mensagem;
-        this._mensagemView.update(this._mensagem);
-      }
-
-    const tratamentoFalhaAoCarregarNegociacoes = (erro) => {
+      this._mensagem.texto = 'Negociações importadas com sucesso';
+      this._mensagemView.update(this._mensagem);
+    })
+    .catch( (erro) => {
       this._mensagem.texto = erro;
       this._mensagemView.update(this._mensagem);
-    }
-
-    service.obterNegociacoesDaSemana()
-      .then(negociacoesCarregadasComSucesso('Negociações da semana corrente importadas com sucesso'))
-      .catch(tratamentoFalhaAoCarregarNegociacoes);
-
-    service.obterNegociacoesDaSemanaAnterior()
-      .then(negociacoesCarregadasComSucesso('Negociações da semana anterior importadas com sucesso'))
-      .catch(tratamentoFalhaAoCarregarNegociacoes);
-
-    service.obterNegociacoesDaSemanaRetrasada()
-      .then(negociacoesCarregadasComSucesso('Negociações da semana retrasada importadas com sucesso'))
-      .catch(tratamentoFalhaAoCarregarNegociacoes);
+    })
   }
 
   _criaNegociacao() {
