@@ -49,6 +49,50 @@ class NegociacaoController {
     this._mensagemView.update(this._mensagem);
   }
 
+  importaNegociacoes() {
+    let xhr = new XMLHttpRequest();
+
+    xhr.open('GET', 'http://localhost:3000/negociacoes/semana');
+
+    // 0: requisição ainda não iniciada
+    // 1: conexão com o servidor estabelecida
+    // 2: requisição recebida no servidor
+    // 3: processando requisição no servidor
+    // 4: resposta do processamento devolvida para o cliente
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState == 4) {
+        if (xhr.status == 200) {
+          console.log("Obtendo as negociações do servidor");
+          console.log(xhr.responseText);
+
+          JSON.parse(xhr.responseText)
+            .map(objeto =>
+              new Negociacao(
+                new Date(objeto.data),
+                objeto.quantidade,
+                objeto.valor
+              )
+            )
+            .forEach(negociacao => 
+              this._listaNegociacoes.adiciona(negociacao)
+            );
+            this._negociacoesView.update(this._listaNegociacoes);
+
+            this._mensagem.texto = 'Negociações importadas com sucesso';
+            this._mensagemView.update(this._mensagem);
+        } else {
+          this._mensagem.texto = 'Não foi possível importar as negociações';
+          this._mensagemView.update(this._mensagem);
+
+          console.log("Não foi possível obter as negociações do servido");
+          console.log(xhr.responseText);
+        }
+      }
+    }
+
+    xhr.send();
+  }
+
   _criaNegociacao() {
     return new Negociacao(
       DateHelper.textoParaData( this._inputData.value ),
