@@ -1,8 +1,8 @@
 class IndexedDBService {
 
-  static DATABASE_NAME = () => "negociacoesdb";
-  static DEFAULT_VERSION = () => 1;
-  static DEFAULT_KEY_GENERATOR = () => { return { autoIncrement: true }; };
+  static DATABASE_NAME() { return "negociacoesdb"; }
+  static DEFAULT_VERSION() { return 1; }
+  static DEFAULT_KEY_GENERATOR() { return { autoIncrement: true }; }
 
   constructor(objectStoreDefinitions = [], dataBaseVersion = IndexedDBService.DEFAULT_VERSION()) {
     this._objectStoreDefinitions = objectStoreDefinitions;
