@@ -29,16 +29,17 @@ class IndexedDBService {
 
         const connection = event.target.result;
 
-        for (let objectStoreDefinition in this._objectStoreDefinitions) {
-          if (connection.objectStoreNames.contains(objectStoreDefinition.objectStoreName)) {
-            connection.deleteObjectStore(objectStoreDefinition.objectStoreName);
-          }
+        this._objectStoreDefinitions
+          .forEach(objectStoreDefinition => {
+            if (connection.objectStoreNames.contains(objectStoreDefinition.objectStoreName)) {
+              connection.deleteObjectStore(objectStoreDefinition.objectStoreName);
+            }
 
-          connection.createObjectStore(
-            objectStoreDefinition.objectStoreName, 
-            objectStoreDefinition.keyGenerator || IndexedDBService.DEFAULT_KEY_GENERATOR()
-          );
-        }
+            connection.createObjectStore(
+              objectStoreDefinition.objectStoreName, 
+              objectStoreDefinition.keyGenerator || IndexedDBService.DEFAULT_KEY_GENERATOR()
+            );
+          });
       };
 
       // ON CONNECTION SUCCESS
